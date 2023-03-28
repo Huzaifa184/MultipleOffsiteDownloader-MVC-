@@ -1,0 +1,224 @@
+﻿
+@using Microsoft.AspNetCore.Mvc.Core;
+
+@{
+    ViewData["Title"] = "Home page";
+}
+
+    
+
+<div class="text-center">
+    <h1 class="display-4">
+        <img src="~/images/yt_logo_rgb_light.png" alt="YouTube logo" height="50">
+    </h1>
+</div>
+
+    
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-controller="Home" asp-action="Search" method="post">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Enter a keyword to search for on YouTube" aria-label="Enter a keyword to search for on YouTube" aria-describedby="button-addon2" name="keyword">
+                    <button class="btn btn-primary" type="submit" id="button-addon2">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+   
+    <a asp-action="Login" asp-controller="Home" class="btn btn-success">Login</a>
+
+    
+    <div class="row justify-content-center" id="videoList">
+        <form asp-controller="Home" asp-action="Download" method="post" onsubmit="return updateSelectedVideos();">
+            <div class="form-group row">
+                @foreach (var login in Model)
+                {
+                    // If the video ID is not empty, display the video card.
+                    if (!string.IsNullOrEmpty(login.VideoId))
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <img src="https://img.youtube.com/vi/@login.VideoId/mqdefault.jpg" class="card-img-top" alt="Thumbnail">
+                                <div class="card-body">
+                                    <h5 class="card-title">@login.Title</h5>
+                                    <p class="card-text">@login.Description.Substring(0, Math.Min(100, @login.Description.Length))</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="selectedVideos" value="@login.Yturl" id="check-@login.VideoId">
+                                        <label class="form-check-label" for="check-@login.VideoId">
+                                            Select
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            
+
+            <button type="submit" class="btn btn-primary">Download</button>
+        </form>
+    </div>
+
+
+    <script>
+        function updateSelectedVideos() {
+            var selectedVideos = document.querySelectorAll('input[name="selectedVideos"]:checked');
+            if (selectedVideos.length == 0) {
+                alert("Please select at least one video to download.");
+                return false;
+            }
+            var formData = new FormData();
+            for (var i = 0; i < selectedVideos.length; i++) {
+                formData.append("selectedVideos", selectedVideos[i].value);
+            }
+            fetch('@Url.Action("Download", "Home")', {
+                method: 'POST',
+                body: formData
+            }).then(function (response) {
+                if (response.ok) {
+                    response.text().then(function (data) {
+                        var videoList = document.getElementById("videoList");
+                        videoList.innerHTML = data;
+                    });
+                } else {
+                    alert("An error occurred while downloading the videos.");
+                }
+            });
+            return false;
+        }
+    </script>
+
+
+
+    <script>
+        // This function is responsible for updating the list of selected videos and preparing a form data object for sending to the server for download
+        function updateSelectedVideos() {
+            var selectedVideos = document.querySelectorAll('input[name="selectedVideos"]:checked');
+            if (selectedVideos.length == 0) {
+                alert("Please select at least one video to download.");
+                return false;
+            }
+            var formData = new FormData();
+            for (var i = 0; i < selectedVideos.length; i++) {
+                formData.append("selectedVideos", selectedVideos[i].value);
+            }
+            fetch('@Url.Action("Download", "Home")', {
+                method: 'POST',
+                body: formData
+            }).then(function (response) {
+                if (response.ok) {
+                    response.text().then(function (data) {
+                        var videoList = document.getElementById("videoList");
+                        videoList.innerHTML = data;
+                    });
+                } else {
+                    alert("An error occurred while downloading the videos.");
+                }
+            });
+            return false;
+        }
+
+    </script>
+
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    }
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        // This function is called when the Google API client is loaded
+        function onClientLoad() {
+            gapi.client.load('youtube', 'v3', function () {
+
+            });
+        }
+
+        // This function is called when the user performs a search for videos
+        function search() {
+            var q = $('input[name="keyword"]').val();
+            var request = gapi.client.youtube.search.list({
+                q: q,
+                part: 'snippet',
+                type: 'video'
+            });
+            request.execute(function (response) {
+                var html = '';
+                var videos = response.result.items;
+                $.each(videos, function (index, video) {
+                    html += '<div class="col-md-4 mb-3">';
+                    html += '<div class="card">';
+                    html += '<img src="' + video.snippet.thumbnails.medium.url + '" class="card-img-top" alt="' + video.snippet.title + '">';
+                    html += '<div class="card-body">';
+                    html += '<h5 class="card-title">' + video.snippet.title + '</h5>';
+                    html += '<p class="card-text">' + video.snippet.description + '</p>';
+                    html += '<button type="button" class="btn btn-primary" data-video-id="' + video.id.videoId + '">Download</button>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                $('#videoList').html(html);
+            });
+        }
+
+        // This function is called when the user selects one or more videos for download
+        function updateSelectedVideos(event) {
+            event.preventDefault();
+            var selectedVideos = document.querySelectorAll('input[name="selectedVideos"]:checked');
+            if (selectedVideos.length == 0) {
+                alert("Please select at least one video to download.");
+                return false;
+            }
+            var formData = new FormData();
+            for (var i = 0; i < selectedVideos.length; i++) {
+                formData.append("selectedVideos", selectedVideos[i].value);
+            }
+            fetch('@Url.Action("Download", "Home")', {
+                method: 'POST',
+                body: formData
+            }).then(function (response) {
+                if (response.ok) {
+                    response.text().then(function (data) {
+                        var videoList = document.getElementById("videoList");
+                        videoList.innerHTML = data;
+                    });
+                } else {
+                    alert("An error occurred while downloading the videos.");
+                }
+            });
+            return false;
+        }
+
+
+
+
+
+            // This code block waits for the document to fully load before executing any code within it
+            $(document).ready(function () {
+            // The Google API client is loaded with a callback function
+            gapi.load('client', { 'callback': onClientLoad });
+
+            // When the search button is clicked, the search function is called
+            $('#button-addon2').click(function () {
+                search();
+            });
+
+            // When the form is submitted, the search function is called and the default form submission behavior is prevented
+            $('form').submit(function (event) {
+                event.preventDefault();
+                search();
+            });
+
+            // When a button with a data-video-id attribute is clicked, the ID is extracted and a video modal is displayed
+            $(document).on('click', 'button[data-video-id]', function () {
+                var videoId = $(this).data('video-id');
+                var videoUrl = 'https://www.youtube.com/embed/' + videoId + '?rel=0&amp;showinfo=0';
+                $('#video-modal').find('iframe').attr('src', videoUrl);
+                $('#video-modal').modal('show');
+            });
+        });
+</script>

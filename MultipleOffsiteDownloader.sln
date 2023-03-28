@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleOffsiteDownloader", "MultipleOffsiteDownloader\MultipleOffsiteDownloader.csproj", "{FEB26058-E4A6-43DB-985A-0D330AA88FAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FEB26058-E4A6-43DB-985A-0D330AA88FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB26058-E4A6-43DB-985A-0D330AA88FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB26058-E4A6-43DB-985A-0D330AA88FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB26058-E4A6-43DB-985A-0D330AA88FAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB404FAD-A2A8-495B-A46A-387C3F85B83C}
+	EndGlobalSection
+EndGlobal
